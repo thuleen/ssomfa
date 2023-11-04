@@ -1,24 +1,27 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "thuleen/ssomfa",
+    "description": "Implements single sign on and multi factor authentication",
     "keywords": [
-        ":vendor_name",
+        "thuleen",
         "laravel",
-        ":package_slug"
+        "ssomfa"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/thuleen/ssomfa",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Azlan",
+            "email": "azlan@thuleen.io",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.1",
         "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0"
+        "illuminate/contracts": "^10.0",
+        "fenguoz/web3.php": "dev-master",
+        "endroid/qr-code": "^5.0@dev",
+        "vlucas/phpdotenv": "^5.5@dev"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
@@ -35,19 +38,19 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Thuleen\\Ssomfa\\": "src/",
+            "Thuleen\\Ssomfa\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "Thuleen\\Ssomfa\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
     "scripts": {
         "post-autoload-dump": "@composer run prepare",
-        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "clear": "@php vendor/bin/testbench package:purge-ssomfa --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": [
             "@composer run prepare",
@@ -73,10 +76,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Thuleen\\Ssomfa\\SsomfaServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "Ssomfa": "Thuleen\\Ssomfa\\Facades\\Ssomfa"
             }
         }
     },
