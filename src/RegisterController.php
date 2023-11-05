@@ -59,9 +59,10 @@ class RegisterController extends Controller
 
     private function generateUrl($username)
     {
+        $timestamp = time();
         $appName = config('app.name');
         $sessionId = session()->getId();
-        $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[SID]__' . $sessionId);
+        $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[SID]__' . $sessionId . '__[TS]__' . $timestamp);
         $dappUrl = env('THULEEN_DAPP_URL');
         return $dappUrl . $encodedQr;
     }

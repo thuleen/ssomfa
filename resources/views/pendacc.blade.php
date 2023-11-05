@@ -18,9 +18,9 @@
 
 <body>
     <div class="d-flex flex-column justify-content-center align-items-center m-3">
-        <h1>Please scan</h1>
+        <h1>Imbas</h1>
         <div class="mb-3">
-            Use smart phone to scan
+            Imbas guna kamera phone
         </div>
         <div class="mb-3">
             <img src={{ $dataUri }} alt='qr code' />
