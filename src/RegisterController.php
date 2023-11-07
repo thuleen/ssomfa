@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Writer\SvgWriter;
 
 class RegisterController extends Controller
@@ -43,7 +44,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Pending creating a new Ethereum account
+     * Pending account creation
      */
     public function pendAcc($username)
     {
@@ -51,6 +52,7 @@ class RegisterController extends Controller
         $url = $this->generateUrl($username);
         $writer = new SvgWriter();
         $qrCode = QrCode::create($url);
+        $qrCode->setForegroundColor(new Color(39, 60, 117));
         $result = $writer->write($qrCode);
         $dataUri = $result->getDataUri();
 

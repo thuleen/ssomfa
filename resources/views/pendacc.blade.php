@@ -13,7 +13,29 @@
             font-weight: 100;
             font-family: 'Oswald', sans-serif;
         }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f8f9fa;
+            font-size: small;
+            color: #273c75;
+        }
+
+        h1 {
+            color: #273c75;
+        }
     </style>
+
+    <script>
+        function copyToClipboard(id) {
+            document.getElementById(id).select();
+            document.execCommand('copy');
+        }
+    </script>
 </head>
 
 <body>
@@ -25,10 +47,12 @@
         <div class="mb-3">
             <img src={{ $dataUri }} alt='qr code' />
         </div>
-        <div class="mb-3">
-            {{ $url }}
+        <div class="d-flex flex-row mb-3">
+            <input class="form-control mr-1" type="text" value="{{ $url }}" id="urlField" readonly>
+            <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-outline-primary">Copy</button>
         </div>
     </div>
+    @include('ssomfa::footer')
 </body>
 
 </html>
