@@ -3,11 +3,32 @@
 namespace Thuleen\Ssomfa\Composers;
 
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Cache;
+use Web3\Utils;
 use Web3\Contract;
+use Web3\Web3;
+use Web3\Providers\HttpProvider;
+use Web3\RequestManagers\HttpRequestManager;
 
 class ContractComposer
 {
+    protected $contractAddress;
+    protected $gethRpcUrl;
+    protected $contractAbi;
+    protected $web3;
+
+    public function __construct()
+    {
+        $this->contractAddress = env('MFA_ADDRESS');
+        $this->gethRpcUrl = env('GETH_RPC_URL');
+        $this->web3 = new Web3(new HttpProvider(new HttpRequestManager($this->gethRpcUrl)));
+
+        $abiFilePath = config('ssomfa.smart-contract.contract_json');
+        $abiJson = file_get_contents($abiFilePath);
+        $abi = json_decode($abiJson, true);
+        $this->contractAbi = $abi['abi'];
+        $this->listenToContractEvents();
+    }
+
     public function compose(View $view)
     {
         try {
@@ -22,15 +43,29 @@ class ContractComposer
     private function isContractLoaded()
     {
         try {
-            $abiFilePath = config('ssomfa.smart-contract.contract_json');
-            $abiJson = file_get_contents($abiFilePath);
-            $abi = json_decode($abiJson, true);
-            $contractAbi = $abi['abi'];
-            $contract = new Contract('http://127.0.0.1:8545', $contractAbi);
-            $contract->at('0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f');
+            $contract = new Contract($this->gethRpcUrl, $this->contractAbi);
+            $contract->at($this->contractAddress);
             return true; // Contract is successfully loaded
         } catch (\Exception $e) {
             return false; // Contract loading failed
         }
+    }
+
+    protected function listenToContractEvents()
+    {
+        $contract = new Contract($this->gethRpcUrl, $this->contractAbi);
+        $contract->at($this->contractAddress);
+        // $contract->call('name', [], function ($err, $result) {
+        //     if ($err !== null) {
+        //         // Handle the error
+        //         dd($err);
+        //     } else {
+        //         // Handle the result
+        //         dd($result);
+        //     }
+        // });
+        $eventName = 'Registered';
+        $eventLogs = $contract->getEventLogs($eventName);
+        dd($eventLogs);
     }
 }
