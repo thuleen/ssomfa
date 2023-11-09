@@ -8,8 +8,9 @@ use Illuminate\Routing\Controller;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Writer\SvgWriter;
+use Closure;
 
-class RegisterController extends Controller
+class AuthController extends Controller
 {
 
     public function __construct()
@@ -19,23 +20,30 @@ class RegisterController extends Controller
         $dotenv->load();
     }
 
-    public function submitForm(Request $request)
+    public function handle($request, Closure $next)
     {
-        $username = $request->input('username');
-        $password = $request->input('password');
+        // Implement the MFA logic here
+        // You can use your 'thuleen/ssomfa' package's functions to verify MFA status
+        // For example, if MFA is not verified, display a custom page or redirect the user
 
-        echo '' . $username . '' . $password . '';
-        if (true) {
-            return redirect()->route('sso.pending.create.ethacc', ['username' => $username]);
-        } else {
-            return redirect()->route('sso.form.login')->with('error', 'Registration failed.');
+        if (!$this->isMfaVerified($request)) {
+            // MFA is not verified, redirect to a custom page
+            return view('ssomfa::test');
         }
+
+        return $next($request);
     }
 
-    /**
-     * Pending account creation
-     */
-    public function pendAcc($username)
+    private function isMfaVerified(Request $request)
+    {
+        // Implement your MFA verification logic here
+        // Use your 'thuleen/ssomfa' package's functions to check MFA status
+
+        // Return true if MFA is verified, false if not
+        // For example, you might check a session variable or other criteria
+    }
+
+    public function auth($username)
     {
         $appName = config('app.name');
         $url = $this->generateUrl($username);
@@ -45,7 +53,7 @@ class RegisterController extends Controller
         $result = $writer->write($qrCode);
         $dataUri = $result->getDataUri();
 
-        return view('ssomfa::pendacc', compact('dataUri', 'url', 'appName'));
+        return view('ssomfa::auth', compact('dataUri', 'url', 'appName'));
     }
 
     private function generateUrl($username)
@@ -56,10 +64,5 @@ class RegisterController extends Controller
         $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[SID]__' . $sessionId . '__[TS]__' . $timestamp);
         $dappUrl = env('THULEEN_DAPP_URL');
         return $dappUrl . $encodedQr;
-    }
-
-    public function index()
-    {
-        return view('thuleen-mfa::registered');
     }
 }

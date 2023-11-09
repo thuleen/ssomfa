@@ -21,7 +21,6 @@
         "illuminate/contracts": "^10.0",
         "react/event-loop": "^1.4.0",
         "spatie/laravel-package-tools": "^1.14.0",
-        "thuleen/eth-php": "dev-master",
         "vlucas/phpdotenv": "^5.5@dev"
     },
     "require-dev": {
