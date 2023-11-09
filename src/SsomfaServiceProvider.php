@@ -31,4 +31,8 @@ class SsomfaServiceProvider extends PackageServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'ssomfa');
         View::composer('ssomfa::pendacc', ContractComposer::class);
     }
+
+    protected $routeMiddleware = [
+        'ssomfa' => \Thuleen\Ssomfa\Http\Middleware\SsoMfaMiddleware::class,
+    ];
 }
