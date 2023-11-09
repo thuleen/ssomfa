@@ -3,11 +3,12 @@
 namespace Thuleen\Ssomfa\Composers;
 
 use Illuminate\View\View;
-use Web3\Utils;
 use Web3\Contract;
 use Web3\Web3;
 use Web3\Providers\HttpProvider;
 use Web3\RequestManagers\HttpRequestManager;
+use React\EventLoop\Loop;
+
 
 class ContractComposer
 {
@@ -15,6 +16,7 @@ class ContractComposer
     protected $gethRpcUrl;
     protected $contractAbi;
     protected $web3;
+    protected $contract;
 
     public function __construct()
     {
@@ -26,6 +28,8 @@ class ContractComposer
         $abiJson = file_get_contents($abiFilePath);
         $abi = json_decode($abiJson, true);
         $this->contractAbi = $abi['abi'];
+        $contract = new Contract($this->gethRpcUrl, $this->contractAbi);
+        $this->contract = $contract->at($this->contractAddress);
         $this->listenToContractEvents();
     }
 
@@ -33,7 +37,8 @@ class ContractComposer
     {
         try {
             $isContractLoaded = $this->isContractLoaded();
-            $view->with(compact('isContractLoaded'));
+            $contractAddress = $this->contractAddress;
+            $view->with(compact('isContractLoaded', 'contractAddress'));
         } catch (\Exception $e) {
             $isContractLoaded = false;
             $view->with(compact('isContractLoaded'));
@@ -51,21 +56,67 @@ class ContractComposer
         }
     }
 
+    // protected function listenToContractEvents()
+    // {
+    //     // Loop::addPeriodicTimer(7, function () {
+    //     // });
+
+    //     $eventName = 'Registered';
+    //     // $eventSignature = $this->web3->eth->abi->encodeEventSignature($this->contractAbi[$eventName]);
+    //     $eventAbi = null;
+    //     foreach ($this->contractAbi as $abiObject) {
+    //         if (isset($abiObject['type']) && $abiObject['type'] === 'event' && $abiObject['name'] === $eventName) {
+    //             $eventAbi = $abiObject;
+    //             break;
+    //         }
+    //     }
+
+    //     if ($eventAbi !== null) {
+    //         // Now you can encode the event signature.
+    //         $eventSignature = $this->web3->abi->encodeEventSignature($eventAbi);
+    //         // Continue with your event listening logic.
+    //         dump($eventSignature);
+    //     } else {
+    //         // Handle the case where the event was not found in the ABI.
+    //         echo "Event not found in ABI.";
+    //     }
+    // }
+
     protected function listenToContractEvents()
     {
-        $contract = new Contract($this->gethRpcUrl, $this->contractAbi);
-        $contract->at($this->contractAddress);
-        // $contract->call('name', [], function ($err, $result) {
-        //     if ($err !== null) {
-        //         // Handle the error
-        //         dd($err);
-        //     } else {
-        //         // Handle the result
-        //         dd($result);
-        //     }
-        // });
         $eventName = 'Registered';
-        $eventLogs = $contract->getEventLogs($eventName);
-        dd($eventLogs);
+
+        $eventAbi = null;
+        foreach ($this->contractAbi as $abiObject) {
+            if (isset($abiObject['type']) && $abiObject['type'] === 'event' && $abiObject['name'] === $eventName) {
+                $eventAbi = $abiObject;
+                break;
+            }
+        }
+
+        if ($eventAbi !== null) {
+            // Encode the event signature using web3.php
+            $eventSignature = $this->web3->eth->abi->encodeEventSignature($eventAbi);
+
+            // Specify the filter options to get the logs for the "Registered" event.
+            $filterOptions = [
+                'address' => $this->contractAddress,
+                'topics' => [$eventSignature],
+            ];
+
+            // Use the getLogs method to retrieve the event logs.
+            $logs = $this->web3->eth->getLogs($filterOptions);
+
+            // Process the logs.
+            foreach ($logs as $log) {
+                // Decode the log data to get the event data.
+                $eventData = $this->web3->eth->abi->decodeLog($eventAbi, $log);
+                // Handle the event data as needed.
+                dump($eventData);
+            }
+        } else {
+            // Handle the case where the event was not found in the ABI.
+            echo "Event not found in ABI.";
+        }
     }
 }

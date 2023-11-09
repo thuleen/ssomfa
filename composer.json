@@ -15,18 +15,13 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/thuleen/web3.php"
-        }
-    ],
     "require": {
         "php": "^8.1",
-        "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0",
-        "thuleen/web3.php": "dev-master",
         "endroid/qr-code": "^5.0@dev",
+        "illuminate/contracts": "^10.0",
+        "react/event-loop": "^1.4.0",
+        "spatie/laravel-package-tools": "^1.14.0",
+        "thuleen/eth-php": "dev-master",
         "vlucas/phpdotenv": "^5.5@dev"
     },
     "require-dev": {

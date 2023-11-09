@@ -25,20 +25,9 @@ class RegisterController extends Controller
         $password = $request->input('password');
 
         echo '' . $username . '' . $password . '';
-
-        // Pass the form data to the MfaService method in your package
-        // $result = $registerService->processForm($username, $password);
-
-        // Handle the result and return a response
-        // You can redirect, display a message, or perform any other action here
-
-        // Check if registration was successful
         if (true) {
-            // Redirect to the success page
             return redirect()->route('sso.pending.create.ethacc', ['username' => $username]);
         } else {
-            // Registration failed, you can handle this accordingly
-            // For example, return to the registration form with an error message
             return redirect()->route('sso.form.login')->with('error', 'Registration failed.');
         }
     }
