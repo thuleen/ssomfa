@@ -115,7 +115,7 @@
             <img src={{ $dataUri }} alt='qr code' />
         </div>
         <div class="mb-3">
-            <h5>dan masukkan 5 digit nombor:</h5>
+            <h5>dan masukkan 5 digit nombor: {{ $email }}</h5>
         </div>
         <div class="d-flex flex-column mb-3 align-items-center">
             <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off" id="otpForm">

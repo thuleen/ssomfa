@@ -16,8 +16,6 @@ use Illuminate\Support\Facades\Cache;
 class SsoMfaMiddleware
 {
 
-    protected $appName;
-
     public function __construct()
     {
         $packageRoot = dirname(__DIR__, 3);
@@ -27,10 +25,10 @@ class SsoMfaMiddleware
 
     public function handle($request, Closure $next)
     {
-        if (!$this->isMfaVerified($request)) {
-            $this->appName = config('app.name');
-            $appName = $this->appName;
-            $email = $request->input('email');
+        $appName = config('app.name');
+        $email = $request->user()->email;
+        if (!$this->isMfaVerified($request, $appName, $email)) {
+
             // MFA is not verified, create a view response and return it
             $url = $this->generateUrl($email);
             $writer = new SvgWriter();
@@ -52,20 +50,20 @@ class SsoMfaMiddleware
         $otp = $request['digit-1'] . $request['digit-2'] . $request['digit-3'] . $request['digit-4'] . $request['digit-5'];
 
         $cacheKey = $request->input('email') . '_otp';
-        Cache::put($cacheKey, $otp, now()->addMinutes(10)); // Adjust the expiration time as needed
+        Cache::put($cacheKey, $otp, now()->addMinutes(3)); // Adjust the expiration time as needed
 
         // Redirect to the dashboard or the intended URL
         return redirect(route('dashboard'));
     }
 
-    private function isMfaVerified(Request $request)
+    private function isMfaVerified(Request $request, $appName, $email)
     {
-        $cacheKey = $request->input('email') . '_otp';
+        $email = $request->input('email');
+        $cacheKey = $email . '_otp';
         $otp = Cache::get($cacheKey);
-        $appName = $this->appName;
         // request rest api at endpoint http://localhost:9000/verify
         // Make a request to the verification endpoint
-        $response = Http::post('http://localhost:9000/verify', ['otp' => $otp]);
+        $response = Http::post('http://localhost:9000/verify', ['appName' => $appName, 'email' => $email, 'otp' => $otp]);
 
         $responseData = $response->json();
         dump($responseData['verify']);
@@ -77,6 +75,7 @@ class SsoMfaMiddleware
 
     protected function generateUrl($username)
     {
+        dump($username);
         $timestamp = time();
         $appName = config('app.name');
         $sessionId = session()->getId();
