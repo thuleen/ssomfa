@@ -84,7 +84,25 @@
         });
     </script>
 
+    <script>
+        function submitForm() {
+            // Gather the values from digit inputs
+            let digit1 = document.getElementById('digit-1').value;
+            let digit2 = document.getElementById('digit-2').value;
+            let digit3 = document.getElementById('digit-3').value;
+            let digit4 = document.getElementById('digit-4').value;
+            let digit5 = document.getElementById('digit-5').value;
 
+            // Check if all digits are entered
+            if (digit1 && digit2 && digit3 && digit4 && digit5) {
+                // If all digits are entered, submit the form
+                document.getElementById('otpForm').submit();
+            } else {
+                // If any digit is missing, display an alert or handle it accordingly
+                alert('Please enter all digits.');
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -100,7 +118,7 @@
             <h5>dan masukkan 5 digit nombor:</h5>
         </div>
         <div class="d-flex flex-column mb-3 align-items-center">
-            <form method="get" class="digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off">
+            <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off" id="otpForm">
                 <div class="d-flex flex-column">
                     <div class="digit-inputs mb-3">
                         <input type="text" id="digit-1" name="digit-1" data-next="digit-2" maxlength="1" />

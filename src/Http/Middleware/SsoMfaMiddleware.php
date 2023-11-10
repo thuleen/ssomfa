@@ -3,16 +3,20 @@
 namespace Thuleen\Ssomfa\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response; // Import the Response class at the top
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Writer\SvgWriter;
 use Dotenv\Dotenv;
+use Illuminate\Support\Facades\Cache;
 
 
 class SsoMfaMiddleware
 {
+
+    protected $appName;
 
     public function __construct()
     {
@@ -24,7 +28,8 @@ class SsoMfaMiddleware
     public function handle($request, Closure $next)
     {
         if (!$this->isMfaVerified($request)) {
-            $appName = config('app.name');
+            $this->appName = config('app.name');
+            $appName = $this->appName;
             $email = $request->input('email');
             // MFA is not verified, create a view response and return it
             $url = $this->generateUrl($email);
@@ -34,21 +39,41 @@ class SsoMfaMiddleware
             $result = $writer->write($qrCode);
             $dataUri = $result->getDataUri();
 
-            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName')));
+            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email')));
+            // return redirect(route('verify.qrcode'))->with(['dataUri', $dataUri]);
         }
 
         return $next($request);
     }
 
+    public function submitOtpForm(Request $request)
+    {
+
+        $otp = $request['digit-1'] . $request['digit-2'] . $request['digit-3'] . $request['digit-4'] . $request['digit-5'];
+
+        $cacheKey = $request->input('email') . '_otp';
+        Cache::put($cacheKey, $otp, now()->addMinutes(10)); // Adjust the expiration time as needed
+
+        // Redirect to the dashboard or the intended URL
+        return redirect(route('dashboard'));
+    }
+
     private function isMfaVerified(Request $request)
     {
-        // Implement your MFA verification logic here
-        // Use your 'thuleen/ssomfa' package's functions to check MFA status
+        $cacheKey = $request->input('email') . '_otp';
+        $otp = Cache::get($cacheKey);
+        $appName = $this->appName;
+        // request rest api at endpoint http://localhost:9000/verify
+        // Make a request to the verification endpoint
+        $response = Http::post('http://localhost:9000/verify', ['otp' => $otp]);
 
-        // Return true if MFA is verified, false if not
-        // For example, you might check a session variable or other criteria
-        return false;
+        $responseData = $response->json();
+        dump($responseData['verify']);
+
+        // Return false if any checks fail
+        return $responseData['verify'] === true;
     }
+
 
     protected function generateUrl($username)
     {
