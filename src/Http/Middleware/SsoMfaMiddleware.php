@@ -25,7 +25,7 @@ class SsoMfaMiddleware
         $response = Http::get($ssoApiUrl);
         $responseData = $response->json();
 
-        SsomfaPackageState::setContractIsLoaded($responseData['status'] === 'OK');
+        SsomfaPackageState::setContractIsLoaded(strlen($responseData['contractName']) > 0);
         SsomfaPackageState::setMfaContractAddress($responseData['contractAddress']);
     }
 
