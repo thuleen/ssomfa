@@ -26,16 +26,22 @@
             color: #273c75;
         }
 
+        .code-blue {
+            color: #273c75;
+            /* or any other shade of blue you prefer */
+            font-size: small;
+        }
+
         h1,
         h5 {
             color: #273c75;
         }
 
-        .digit-group {
+        .otp-digit-group {
             display: flex;
         }
 
-        .digit-group input {
+        .otp-digit-group input {
             width: 3rem;
             /* Adjust the width as needed */
             height: 3rem;
@@ -55,7 +61,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const digitInputs = document.querySelectorAll('.digit-inputs input');
+            const digitInputs = document.querySelectorAll('.otp-digit-inputs input');
 
             digitInputs.forEach((input, index) => {
                 input.addEventListener('input', function() {
@@ -87,11 +93,11 @@
     <script>
         function submitForm() {
             // Gather the values from digit inputs
-            let digit1 = document.getElementById('digit-1').value;
-            let digit2 = document.getElementById('digit-2').value;
-            let digit3 = document.getElementById('digit-3').value;
-            let digit4 = document.getElementById('digit-4').value;
-            let digit5 = document.getElementById('digit-5').value;
+            let digit1 = document.getElementById('otp_digit-1').value;
+            let digit2 = document.getElementById('otp_digit-2').value;
+            let digit3 = document.getElementById('otp_digit-3').value;
+            let digit4 = document.getElementById('otp_digit-4').value;
+            let digit5 = document.getElementById('otp_digit-5').value;
 
             // Check if all digits are entered
             if (digit1 && digit2 && digit3 && digit4 && digit5) {
@@ -115,26 +121,34 @@
             <img src={{ $dataUri }} alt='qr code' />
         </div>
         <div class="mb-3">
-            <h5>dan masukkan 5 digit nombor: {{ $email }}</h5>
+            <h5>dan masukkan 5 digit nombor: @if ($isOtpValid === false)
+                <span class="font-weight-bold text-danger">Invalid</span>
+                @endif
+            </h5>
         </div>
         <div class="d-flex flex-column mb-3 align-items-center">
-            <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="digit-group" data-group-name="digits" data-autosubmit="false" autocomplete="off" id="otpForm">
+            <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">
                 <div class="d-flex flex-column">
-                    <div class="digit-inputs mb-3">
-                        <input type="text" id="digit-1" name="digit-1" data-next="digit-2" maxlength="1" />
-                        <input type="text" id="digit-2" name="digit-2" data-next="digit-3" data-previous="digit-1" maxlength="1" />
-                        <input type="text" id="digit-3" name="digit-3" data-next="digit-4" data-previous="digit-2" maxlength="1" />
-                        <input type="text" id="digit-4" name="digit-4" data-next="digit-5" data-previous="digit-3" maxlength="1" />
-                        <input type="text" id="digit-5" name="digit-5" data-next="digit-6" data-previous="digit-4" maxlength="1" />
+                    <div class="otp-digit-inputs mb-3">
+                        <input type="text" id="digit-1" name="otp-digit-1" data-next="otp-digit-2" maxlength="1" />
+                        <input type="text" id="digit-2" name="otp-digit-2" data-next="otp-digit-3" data-previous="otp-digit-1" maxlength="1" />
+                        <input type="text" id="digit-3" name="otp-digit-3" data-next="otp-digit-4" data-previous="otp-digit-2" maxlength="1" />
+                        <input type="text" id="digit-4" name="otp-digit-4" data-next="otp-digit-5" data-previous="otp-digit-3" maxlength="1" />
+                        <input type="text" id="digit-5" name="otp-digit-5" data-next="otp-digit-6" data-previous="otp-digit-4" maxlength="1" />
+                        <input hidden name="email" value='{{$email}}' />
                     </div>
                     <button type="submit" class="btn btn-primary">OK</button>
                 </div>
             </form>
         </div>
     </div>
-    <div class="d-flex flex-row mb-3 align-items-center ">
-        <input class="form-control mr-1" type="text" value="{{ $url }}" id="urlField" readonly>
+    <!-- developer console -->
+    <hr />
+    <div class="d-flex flex-column m-3">
+        <h6>Developer console</h6>
+        <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
         <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-outline-primary">Copy</button>
+        {{ $email }}
     </div>
     @include('ssomfa::footer')
 </body>
