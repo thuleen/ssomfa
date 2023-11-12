@@ -21,7 +21,9 @@ class SsoMfaMiddleware
         $dotenv = Dotenv::createImmutable($packageRoot);
         $dotenv->load();
 
-        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'init';
+        $appId = config('app.id');
+        $appName = config('app.name');
+        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'init' . '/' . $appId . '/' . $appName;
         $response = Http::get($ssoApiUrl);
         $responseData = $response->json();
 
@@ -94,14 +96,10 @@ class SsoMfaMiddleware
 
     protected function generateUrl($username)
     {
-        // Sample public key
-        // $pk = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
-        $pk = null;
         $timestamp = time();
         $appId = env('APP_ID');
-        // dump($appId);
         $appName = config('app.name');
-        $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[APPID]__' . $appId . '__[TS]__' . $timestamp . '__[PK]__' . $pk);
+        $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[APPID]__' . $appId . '__[TS]__' . $timestamp);
         $dappUrl = env('THULEEN_SSOMFA_DAPP_URL');
         return $dappUrl . $encodedQr;
     }
