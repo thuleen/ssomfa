@@ -81,16 +81,16 @@ class SsoMfaMiddleware
     private function isMfaVerified(Request $request, $appId, $appName, $email)
     {
         $otp = SsomfaPackageState::getUserOtpGuess();
-        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'verify';
+        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
         // Make a request to the verification endpoint
         $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'otp' => $otp]);
 
         $responseData = $response->json();
 
-        SsomfaPackageState::setOtpValid($responseData['verify'] === true);
+        SsomfaPackageState::setOtpValid($responseData['okToLogin'] === true);
 
         // Return false if any checks fail
-        return $responseData['verify'] === true;
+        return $responseData['okToLogin'] === true;
     }
 
 
@@ -102,5 +102,12 @@ class SsoMfaMiddleware
         $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[APPID]__' . $appId . '__[TS]__' . $timestamp);
         $dappUrl = env('THULEEN_SSOMFA_DAPP_URL');
         return $dappUrl . $encodedQr;
+    }
+
+    public function logout()
+    {
+        // Add logic to perform logout actions
+        // For example, clear user-specific data in SsomfaPackageState
+        dump('logout!');
     }
 }
