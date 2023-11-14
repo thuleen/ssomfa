@@ -37,7 +37,8 @@ class SsoMfaMiddleware
         $appName = config('app.name');
         $email = $request->user()->email;
         SsomfaPackageState::setUserEmail($email);
-        if (!$this->isMfaVerified($request, $appId, $appName, $email) && !SsomfaPackageState::getUserOtpGuess()) {
+
+        if (!$this->isMfaVerified() && !SsomfaPackageState::getUserOtpGuess()) {
 
             $url = $this->generateUrl($email);
             $writer = new SvgWriter();
@@ -52,7 +53,7 @@ class SsoMfaMiddleware
             return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid')));
         }
 
-        if (!$this->isMfaVerified($request, $appId, $appName, $email) && SsomfaPackageState::getUserOtpGuess()) {
+        if (!$this->isMfaVerified() && SsomfaPackageState::getUserOtpGuess()) {
 
             $url = $this->generateUrl($email);
             $writer = new SvgWriter();
@@ -78,19 +79,23 @@ class SsoMfaMiddleware
         return redirect(route('dashboard'));
     }
 
-    private function isMfaVerified(Request $request, $appId, $appName, $email)
+    private function isMfaVerified()
     {
+        $appId = config('app.id');
+        $appName = config('app.name');
+        $email = SsomfaPackageState::getUserEmail();
         $otp = SsomfaPackageState::getUserOtpGuess();
         $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
         // Make a request to the verification endpoint
         $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'otp' => $otp]);
 
-        $responseData = $response->json();
+        $resDat = $response->json();
+        dump($resDat);
 
-        SsomfaPackageState::setOtpValid($responseData['okToLogin'] === true);
+        SsomfaPackageState::setOtpValid($resDat['okToLogin'] === true);
 
         // Return false if any checks fail
-        return $responseData['okToLogin'] === true;
+        return $resDat['okToLogin'] === true;
     }
 
 
@@ -106,8 +111,10 @@ class SsoMfaMiddleware
 
     public function logout()
     {
-        // Add logic to perform logout actions
-        // For example, clear user-specific data in SsomfaPackageState
-        dump('logout!');
+        $appId = config('app.id');
+        $email = SsomfaPackageState::getUserEmail();
+        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'logout';
+        // Make a request to the verification endpoint
+        $response = Http::post($ssoApiUrl, ['appId' => $appId, 'email' => $email]);
     }
 }
