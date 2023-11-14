@@ -20,15 +20,17 @@ class SsoMfaMiddleware
         $packageRoot = dirname(__DIR__, 3);
         $dotenv = Dotenv::createImmutable($packageRoot);
         $dotenv->load();
-
-        $appId = config('app.id');
-        $appName = config('app.name');
-        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'init' . '/' . $appId . '/' . $appName;
-        $response = Http::get($ssoApiUrl);
-        $responseData = $response->json();
-
-        SsomfaPackageState::setContractIsLoaded(strlen($responseData['contractName']) > 0);
-        SsomfaPackageState::setMfaContractAddress($responseData['contractAddress']);
+        try {
+            $appId = config('app.id');
+            $appName = config('app.name');
+            $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'init' . '/' . $appId . '/' . $appName;
+            $response = Http::get($ssoApiUrl);
+            $responseData = $response->json();
+            SsomfaPackageState::setContractIsLoaded(strlen($responseData['contractName']) > 0);
+            SsomfaPackageState::setMfaContractAddress($responseData['contractAddress']);
+        } catch (\Exception $e) {
+            SsomfaPackageState::setContractIsLoaded(false);
+        }
     }
 
     public function handle($request, Closure $next)
@@ -43,6 +45,7 @@ class SsoMfaMiddleware
             $url = $this->generateUrl($email);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
+            $qrCode->setSize(285);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $result = $writer->write($qrCode);
             $dataUri = $result->getDataUri();
@@ -58,6 +61,7 @@ class SsoMfaMiddleware
             $url = $this->generateUrl($email);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
+            $qrCode->setSize(285);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $result = $writer->write($qrCode);
             $dataUri = $result->getDataUri();
@@ -81,21 +85,24 @@ class SsoMfaMiddleware
 
     private function isMfaVerified()
     {
-        $appId = config('app.id');
-        $appName = config('app.name');
-        $email = SsomfaPackageState::getUserEmail();
-        $otp = SsomfaPackageState::getUserOtpGuess();
-        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
-        // Make a request to the verification endpoint
-        $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'otp' => $otp]);
+        try {
+            $appId = config('app.id');
+            $appName = config('app.name');
+            $email = SsomfaPackageState::getUserEmail();
+            $otp = SsomfaPackageState::getUserOtpGuess();
+            $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
+            // Make a request to the verification endpoint
+            $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'otp' => $otp]);
 
-        $resDat = $response->json();
-        dump($resDat);
+            $resDat = $response->json();
 
-        SsomfaPackageState::setOtpValid($resDat['okToLogin'] === true);
+            SsomfaPackageState::setOtpValid($resDat['okToLogin'] === true);
 
-        // Return false if any checks fail
-        return $resDat['okToLogin'] === true;
+            // Return false if any checks fail
+            return $resDat['okToLogin'] === true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 

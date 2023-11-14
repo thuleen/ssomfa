@@ -7,6 +7,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500&family=Oswald:wght@200;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://kit.fontawesome.com/8627768fb0.js" crossorigin="anonymous"></script>
     <style>
@@ -22,6 +25,8 @@
             text-align: center;
             padding: 10px 0;
             background-color: #f8f9fa;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 500;
             font-size: small;
             color: #273c75;
         }
@@ -33,6 +38,7 @@
         }
 
         h1,
+        h2,
         h5 {
             color: #273c75;
         }
@@ -49,6 +55,12 @@
             text-align: center;
             margin: 0 0.2rem;
             /* Add some spacing between input fields */
+        }
+
+        .thuleen-primary-btn {
+            border: none;
+            background-color: #192a56;
+            color: #fff;
         }
     </style>
 
@@ -112,44 +124,38 @@
 </head>
 
 <body>
-    <div class="d-flex flex-column justify-content-center align-items-center m-3">
-        <h1>Imbas</h1>
-        <div class="mb-3">
-            Imbas guna kamera phone
-        </div>
-        <div class="mb-3">
-            <img src={{ $dataUri }} alt='qr code' />
-        </div>
-        <div class="mb-3">
-            <h5>dan masukkan 5 digit nombor: @if ($isOtpValid === false)
-                <span class="font-weight-bold text-danger">Invalid</span>
-                @endif
-            </h5>
-        </div>
-        <div class="d-flex flex-column mb-3 align-items-center">
-            <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">
-                <div class="d-flex flex-column">
-                    <div class="otp-digit-inputs mb-3">
-                        <input type="text" id="digit-1" name="otp-digit-1" data-next="otp-digit-2" maxlength="1" />
-                        <input type="text" id="digit-2" name="otp-digit-2" data-next="otp-digit-3" data-previous="otp-digit-1" maxlength="1" />
-                        <input type="text" id="digit-3" name="otp-digit-3" data-next="otp-digit-4" data-previous="otp-digit-2" maxlength="1" />
-                        <input type="text" id="digit-4" name="otp-digit-4" data-next="otp-digit-5" data-previous="otp-digit-3" maxlength="1" />
-                        <input type="text" id="digit-5" name="otp-digit-5" data-next="otp-digit-6" data-previous="otp-digit-4" maxlength="1" />
-                        <input hidden name="email" value='{{$email}}' />
+    <div class="d-flex flex-column justify-content-center align-items-center mt-3">
+        <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
+            <h2>1. Imbas QR</h2>
+            <div>
+                <img src={{ $dataUri }} alt='qr code' />
+            </div>
+            <div class="mt-3 mb-3">
+                <h2>2. Masukkan OTP</h2>
+            </div>
+            <div class="d-flex flex-column mb-3 align-items-center">
+                <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">
+                    <div class="d-flex flex-column">
+                        <div class="otp-digit-inputs mb-3">
+                            <input type="text" id="digit-1" name="otp-digit-1" data-next="otp-digit-2" maxlength="1" />
+                            <input type="text" id="digit-2" name="otp-digit-2" data-next="otp-digit-3" data-previous="otp-digit-1" maxlength="1" />
+                            <input type="text" id="digit-3" name="otp-digit-3" data-next="otp-digit-4" data-previous="otp-digit-2" maxlength="1" />
+                            <input type="text" id="digit-4" name="otp-digit-4" data-next="otp-digit-5" data-previous="otp-digit-3" maxlength="1" />
+                            <input type="text" id="digit-5" name="otp-digit-5" data-next="otp-digit-6" data-previous="otp-digit-4" maxlength="1" />
+                            <input hidden name="email" value='{{$email}}' />
+                        </div>
+                        <button type="submit" class="btn btn-primary thuleen-primary-btn">OK</button>
                     </div>
-                    <button type="submit" class="btn btn-primary">OK</button>
-                </div>
-            </form>
+                </form>
+            </div>
+        </div>
+        <!-- developer console -->
+        <div class="d-flex flex-row mt-5">
+            <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
+            <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
         </div>
     </div>
-    <!-- developer console -->
-    <hr />
-    <div class="d-flex flex-column m-3">
-        <h6>Developer console</h6>
-        <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
-        <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-outline-primary">Copy</button>
-        {{ $email }}
-    </div>
+
     @include('ssomfa::footer')
 </body>
 
