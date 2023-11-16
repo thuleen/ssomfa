@@ -39,10 +39,12 @@ class SsoMfaMiddleware
         $appName = config('app.name');
         $email = $request->user()->email;
         SsomfaPackageState::setUserEmail($email);
+        $timestamp = time();
+        dump($timestamp);
 
-        if (!$this->isMfaVerified() && !SsomfaPackageState::getUserOtpGuess()) {
+        if (!$this->isMfaVerified($timestamp) && !SsomfaPackageState::getUserOtpGuess()) {
 
-            $url = $this->generateUrl($email);
+            $url = $this->generateUrl($email, $timestamp);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
             $qrCode->setSize(285);
@@ -53,12 +55,12 @@ class SsoMfaMiddleware
             $isContractLoaded = SsomfaPackageState::isContractLoaded();
             $mfaContractAddr = SsomfaPackageState::getMfaContractAddress();
             $isOtpValid = null;
-            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid')));
+            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
         }
 
-        if (!$this->isMfaVerified() && SsomfaPackageState::getUserOtpGuess()) {
+        if (!$this->isMfaVerified($timestamp) && SsomfaPackageState::getUserOtpGuess()) {
 
-            $url = $this->generateUrl($email);
+            $url = $this->generateUrl($email, $timestamp);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
             $qrCode->setSize(285);
@@ -69,7 +71,7 @@ class SsoMfaMiddleware
             $isContractLoaded = SsomfaPackageState::isContractLoaded();
             $mfaContractAddr = SsomfaPackageState::getMfaContractAddress();
             $isOtpValid = SsomfaPackageState::isOtpValid();
-            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid')));
+            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
         }
 
         return $next($request);
@@ -78,6 +80,7 @@ class SsoMfaMiddleware
     public function submitOtpForm(Request $request)
     {
         $otp = $request['otp-digit-1'] . $request['otp-digit-2'] . $request['otp-digit-3'] . $request['otp-digit-4'] . $request['otp-digit-5'];
+        SsomfaPackageState::setTimestamp($request['timestamp']);
         SsomfaPackageState::setUserOtpGuess($otp);
         // Redirect to the dashboard or the intended URL
         return redirect(route('dashboard'));
@@ -86,13 +89,14 @@ class SsoMfaMiddleware
     private function isMfaVerified()
     {
         try {
+            $timestamp = SsomfaPackageState::getTimestamp();
             $appId = config('app.id');
             $appName = config('app.name');
             $email = SsomfaPackageState::getUserEmail();
             $otp = SsomfaPackageState::getUserOtpGuess();
             $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
             // Make a request to the verification endpoint
-            $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'otp' => $otp]);
+            $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
 
             $resDat = $response->json();
 
@@ -106,9 +110,8 @@ class SsoMfaMiddleware
     }
 
 
-    protected function generateUrl($username)
+    protected function generateUrl($username, $timestamp)
     {
-        $timestamp = time();
         $appId = env('APP_ID');
         $appName = config('app.name');
         $encodedQr = base64_encode($appName . '__[THUSSOMFA]__' . $username . '__[APPID]__' . $appId . '__[TS]__' . $timestamp);

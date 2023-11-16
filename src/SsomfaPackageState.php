@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Session;
 
 class SsomfaPackageState
 {
+  private const EXPIRATION_MINS = 3;
   private const IS_CONTRACT_LOADED = 'thuleen.ssomfa.isContractLoaded';
   private const MFA_CONTRACT_ADDRESS = 'thuleen.ssomfa.contract.mfa.address';
   private const USER_EMAIL = 'thuleen.ssomfa.user.email';
   private const USER_OTP_GUESS = 'thuleen.ssomfa.user.otp';
+  private const TIMESTAMP = 'thuleen.ssomfa.user.timestamp';
   private const USER_OTP_VALID = 'thuleen.ssomfa.user.otp.valid';
 
   private static $isContractLoaded = false;
@@ -56,7 +58,7 @@ class SsomfaPackageState
 
   public static function setUserOtpGuess($otpGuess)
   {
-    Cache::put(self::USER_OTP_GUESS, $otpGuess, now()->addMinutes(10)); // Adjust the expiration time as needed
+    Cache::put(self::USER_OTP_GUESS, $otpGuess, now()->addMinutes(self::EXPIRATION_MINS)); // Adjust the expiration time as needed
   }
 
   public static function getUserOtpGuess()
@@ -66,11 +68,21 @@ class SsomfaPackageState
 
   public static function setOtpValid($valid)
   {
-    Cache::put(self::USER_OTP_VALID, $valid, now()->addMinutes(10));
+    Cache::put(self::USER_OTP_VALID, $valid, now()->addMinutes(self::EXPIRATION_MINS));
   }
 
   public static function isOtpValid()
   {
     return Cache::get(self::USER_OTP_VALID);
+  }
+
+  public static function setTimestamp($ts)
+  {
+    Cache::put(self::TIMESTAMP, $ts);
+  }
+
+  public static function getTimestamp()
+  {
+    return Cache::get(self::TIMESTAMP);
   }
 }

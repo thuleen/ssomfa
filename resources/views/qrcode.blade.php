@@ -143,6 +143,7 @@
                             <input type="text" id="digit-4" name="otp-digit-4" data-next="otp-digit-5" data-previous="otp-digit-3" maxlength="1" />
                             <input type="text" id="digit-5" name="otp-digit-5" data-next="otp-digit-6" data-previous="otp-digit-4" maxlength="1" />
                             <input hidden name="email" value='{{$email}}' />
+                            <input hidden name="timestamp" value='{{$timestamp}}' />
                         </div>
                         <button type="submit" class="btn btn-primary thuleen-primary-btn">OK</button>
                     </div>
@@ -150,9 +151,10 @@
             </div>
         </div>
         <!-- developer console -->
-        <div class="d-flex flex-row mt-5">
+        <div class="d-flex flex-column mt-2 align-items-center">
             <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
             <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
+            {{ $timestamp }}
         </div>
     </div>
 
