@@ -126,12 +126,12 @@
 <body>
     <div class="d-flex flex-column justify-content-center align-items-center mt-3">
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
-            <h2>1. Imbas QR</h2>
+            <h2>1. QR</h2>
             <div>
                 <img src={{ $dataUri }} alt='qr code' />
             </div>
-            <div class="mt-3 mb-3">
-                <h2>2. Masukkan OTP</h2>
+            <div class="mt-5 mb-3">
+                <h2>2. OTP</h2>
             </div>
             <div class="d-flex flex-column mb-3 align-items-center">
                 <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">
@@ -151,10 +151,9 @@
             </div>
         </div>
         <!-- developer console -->
-        <div class="d-flex flex-column mt-2 align-items-center">
+        <div class="d-flex flex-row mt-2 align-items-center">
             <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
             <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
-            {{ $timestamp }}
         </div>
     </div>
 

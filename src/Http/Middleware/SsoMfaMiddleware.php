@@ -40,14 +40,12 @@ class SsoMfaMiddleware
         $email = $request->user()->email;
         SsomfaPackageState::setUserEmail($email);
         $timestamp = time();
-        dump($timestamp);
 
         if (!$this->isMfaVerified($timestamp) && !SsomfaPackageState::getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
-            $qrCode->setSize(285);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $result = $writer->write($qrCode);
             $dataUri = $result->getDataUri();
@@ -56,14 +54,11 @@ class SsoMfaMiddleware
             $mfaContractAddr = SsomfaPackageState::getMfaContractAddress();
             $isOtpValid = null;
             return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
-        }
-
-        if (!$this->isMfaVerified($timestamp) && SsomfaPackageState::getUserOtpGuess()) {
+        } elseif (!$this->isMfaVerified($timestamp) && SsomfaPackageState::getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
             $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
-            $qrCode->setSize(285);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $result = $writer->write($qrCode);
             $dataUri = $result->getDataUri();
@@ -73,6 +68,12 @@ class SsoMfaMiddleware
             $isOtpValid = SsomfaPackageState::isOtpValid();
             return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
         }
+
+        $otp = SsomfaPackageState::getUserOtpGuess();
+        $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'logged';
+        $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
+        $resDat = $response->json();
+        dump($resDat);
 
         return $next($request);
     }
@@ -97,14 +98,13 @@ class SsoMfaMiddleware
             $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'login';
             // Make a request to the verification endpoint
             $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
-
             $resDat = $response->json();
 
             SsomfaPackageState::setOtpValid($resDat['okToLogin'] === true);
 
-            // Return false if any checks fail
             return $resDat['okToLogin'] === true;
         } catch (\Exception $e) {
+            dump($e);
             return false;
         }
     }
@@ -125,6 +125,6 @@ class SsoMfaMiddleware
         $email = SsomfaPackageState::getUserEmail();
         $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'logout';
         // Make a request to the verification endpoint
-        $response = Http::post($ssoApiUrl, ['appId' => $appId, 'email' => $email]);
+        Http::post($ssoApiUrl, ['appId' => $appId, 'email' => $email]);
     }
 }
