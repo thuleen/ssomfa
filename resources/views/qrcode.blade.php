@@ -37,6 +37,10 @@
             font-size: small;
         }
 
+        .warning-text {
+            color: #c23616;
+        }
+
         h1,
         h2,
         h5 {

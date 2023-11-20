@@ -7,6 +7,6 @@
     @else
     <i class="fa-solid fa-exclamation-triangle text-warning">
     </i>
-    WARNING! CONTRACT IS NOT LOADED!
+    <span class="warning-text">CONTRACT IS NOT CORRECTLY LOADED!</span>
     @endif
 </div>
