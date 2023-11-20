@@ -73,7 +73,7 @@ class SsoMfaMiddleware
         $ssoApiUrl = env('THULEEN_SSOMFA_API_URL') . 'logged';
         $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
         $resDat = $response->json();
-        dump($resDat);
+        // dump($resDat);
 
         return $next($request);
     }
