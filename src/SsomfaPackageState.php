@@ -15,74 +15,94 @@ class SsomfaPackageState
   private const USER_OTP_GUESS = 'thuleen.ssomfa.user.otp';
   private const TIMESTAMP = 'thuleen.ssomfa.user.timestamp';
   private const USER_OTP_VALID = 'thuleen.ssomfa.user.otp.valid';
+  private const DEV_MODE = 'thuleen.ssomfa.dev.mode';
 
-  private static $isContractLoaded = false;
+  private $isContractLoaded = false;
+  private $guessCounter = 0;
 
-  public static function setContractIsLoaded($isLoaded)
+  public function setContractIsLoaded($isLoaded)
   {
-    self::$isContractLoaded = $isLoaded;
+    $this->isContractLoaded = $isLoaded;
     Cache::put(self::IS_CONTRACT_LOADED, $isLoaded);
   }
 
-  public static function isContractLoaded()
+  public function isContractLoaded()
   {
     // Check if the property is set; if not, retrieve from the cache
-    if (self::$isContractLoaded === null) {
-      self::$isContractLoaded = Cache::get(self::IS_CONTRACT_LOADED, false);
+    if ($this->isContractLoaded === null) {
+      $this->isContractLoaded = Cache::get(self::IS_CONTRACT_LOADED, false);
     }
 
-    return self::$isContractLoaded;
+    return $this->isContractLoaded;
   }
 
-  public static function setMfaContractAddress($address)
+  public function setMfaContractAddress($address)
   {
     Cache::put(self::MFA_CONTRACT_ADDRESS, $address);
   }
 
-  public static function getMfaContractAddress()
+  public function getMfaContractAddress()
   {
     return Cache::get(self::MFA_CONTRACT_ADDRESS);
   }
 
-  public static function setUserEmail($email)
+  public function setUserEmail($email)
   {
     // Store the user's email in the session
     Session::put(self::USER_EMAIL, $email);
   }
 
-  public static function getUserEmail()
+  public function getUserEmail()
   {
     // Retrieve the user's email from the session
     return Session::get(self::USER_EMAIL);
   }
 
-  public static function setUserOtpGuess($otpGuess)
+  public function setUserOtpGuess($otpGuess)
   {
     Cache::put(self::USER_OTP_GUESS, $otpGuess, now()->addMinutes(self::EXPIRATION_MINS)); // Adjust the expiration time as needed
+    $this->guessCounter++;
   }
 
-  public static function getUserOtpGuess()
+  public function incrementGuessCounter()
+  {
+    $count = Cache::get(self::USER_OTP_GUESS . '.count', 0);
+    $count++;
+    Cache::put(self::USER_OTP_GUESS . '.count', $count, now()->addMinutes(self::EXPIRATION_MINS));
+  }
+
+  public function getUserOtpGuess()
   {
     return Cache::get(self::USER_OTP_GUESS);
   }
 
-  public static function setOtpValid($valid)
+  public function setOtpValid($valid)
   {
     Cache::put(self::USER_OTP_VALID, $valid, now()->addMinutes(self::EXPIRATION_MINS));
   }
 
-  public static function isOtpValid()
+  public function isOtpValid()
   {
     return Cache::get(self::USER_OTP_VALID);
   }
 
-  public static function setTimestamp($ts)
+  public function setTimestamp($ts)
   {
     Cache::put(self::TIMESTAMP, $ts);
   }
 
-  public static function getTimestamp()
+  public function getTimestamp()
   {
     return Cache::get(self::TIMESTAMP);
+  }
+
+  public function setDevMode($mode)
+  {
+    Cache::put(self::DEV_MODE, $mode);
+  }
+
+  public function getDevMode()
+  {
+    return Cache::get(self::DEV_MODE);
   }
 }

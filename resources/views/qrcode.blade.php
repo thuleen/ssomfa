@@ -41,6 +41,12 @@
             color: #c23616;
         }
 
+        .alert,
+        alert-warning {
+            font-weight: bold;
+            font-size: 1.0rem;
+        }
+
         h1,
         h2,
         h5 {
@@ -134,6 +140,13 @@
             <div>
                 <img src={{ $dataUri }} alt='qr code' />
             </div>
+            <div style="height: 27px">
+                @if(!$isOtpValid && $count > 0)
+                <div class="alert alert-danger" style="width: 295px" role="alert">
+                    Imbas sekali lagi dan masukkan OTP!
+                </div>
+                @endif
+            </div>
             <div class="mt-5 mb-3">
                 <h2>2. OTP</h2>
             </div>
@@ -155,10 +168,12 @@
             </div>
         </div>
         <!-- developer console -->
+        @if($devMode)
         <div class="d-flex flex-row mt-2 align-items-center">
-            <input class="form-control mb-1" type="text" value="{{ $url }}" id="urlField" readonly>
+            <input class="form-control mb-1" style="width: 375px;" type="text" value="{{ $url }}" id="urlField" readonly>
             <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
         </div>
+        @endif
     </div>
 
     @include('ssomfa::footer')

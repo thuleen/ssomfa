@@ -5,17 +5,19 @@ namespace Thuleen\Ssomfa\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Writer\SvgWriter;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Logo\Logo;
 use Dotenv\Dotenv;
 use Thuleen\Ssomfa\SsomfaPackageState;
+use Illuminate\Support\Facades\Cache;
 
 class SsoMfaMiddleware
 {
     protected $apiUrl;
     protected $dappUrl;
+    protected $state;
 
     public function __construct()
     {
@@ -30,11 +32,13 @@ class SsoMfaMiddleware
             $response = Http::get($ssoApiUrl);
             $responseData = $response->json();
             $this->dappUrl = $responseData['dappUrl'];
-            SsomfaPackageState::setContractIsLoaded(strlen($responseData['contractName']) > 0);
-            SsomfaPackageState::setMfaContractAddress($responseData['contractAddress']);
+            $this->state = new SsomfaPackageState();
+            $this->state->setContractIsLoaded(strlen($responseData['contractName']) > 0);
+            $this->state->setMfaContractAddress($responseData['contractAddress']);
+            $this->state->setDevMode($responseData['devMode']);
         } catch (\Exception $e) {
             // dump($e);
-            SsomfaPackageState::setContractIsLoaded(false);
+            $this->state->setContractIsLoaded(false);
         }
     }
 
@@ -43,10 +47,11 @@ class SsoMfaMiddleware
         $appId = config('app.id');
         $appName = config('app.name');
         $email = $request->user()->email;
-        SsomfaPackageState::setUserEmail($email);
+        $this->state->setUserEmail($email);
         $timestamp = time();
 
-        $isContractLoaded = SsomfaPackageState::isContractLoaded();
+        $isContractLoaded = $this->state->isContractLoaded();
+        $devMode = $this->state->getDevMode();
 
         if (!$isContractLoaded) {
             $dappUrl = $this->dappUrl;
@@ -54,44 +59,54 @@ class SsoMfaMiddleware
             return response(view('ssomfa::warning', compact('isContractLoaded', 'dappUrl')));
         }
 
-        if (!$this->isMfaVerified($timestamp) && !SsomfaPackageState::getUserOtpGuess()) {
+        $count = Cache::get('thuleen.ssomfa.user.otp.count', 0);
+
+        if (!$this->isMfaVerified($timestamp) && !$this->state->getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
-            $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
-            $result = $writer->write($qrCode);
+            $logo = Logo::create(__DIR__ . '/assets/images/logo.png')
+                // ->setResizeToWidth(55)
+                ->setPunchoutBackground(true);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode, $logo);
             $dataUri = $result->getDataUri();
 
-            $mfaContractAddr = SsomfaPackageState::getMfaContractAddress();
+            $mfaContractAddr = $this->state->getMfaContractAddress();
             $isOtpValid = null;
-            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
-        } elseif (!$this->isMfaVerified($timestamp) && SsomfaPackageState::getUserOtpGuess()) {
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count')));
+        } elseif (!$this->isMfaVerified($timestamp) && $this->state->getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
-            $writer = new SvgWriter();
             $qrCode = QrCode::create($url);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
-            $result = $writer->write($qrCode);
+            $logo = Logo::create(__DIR__ . '/assets/images/logo.png')
+                // ->setResizeToWidth(55)
+                ->setPunchoutBackground(true);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode, $logo);
             $dataUri = $result->getDataUri();
 
-            $mfaContractAddr = SsomfaPackageState::getMfaContractAddress();
-            $isOtpValid = SsomfaPackageState::isOtpValid();
-            return response(view('ssomfa::qrcode', compact('dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp')));
+            $mfaContractAddr = $this->state->getMfaContractAddress();
+            $isOtpValid = $this->state->isOtpValid();
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count')));
         }
 
-        $otp = SsomfaPackageState::getUserOtpGuess();
+        $otp = $this->state->getUserOtpGuess();
         $ssoApiUrl = $this->apiUrl . '/logged';
         Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
-
+        Cache::set('thuleen.ssomfa.user.otp.count', 0);
         return $next($request);
     }
 
     public function submitOtpForm(Request $request)
     {
+        $this->state->incrementGuessCounter(); // Increment the counter
+
         $otp = $request['otp-digit-1'] . $request['otp-digit-2'] . $request['otp-digit-3'] . $request['otp-digit-4'] . $request['otp-digit-5'];
-        SsomfaPackageState::setTimestamp($request['timestamp']);
-        SsomfaPackageState::setUserOtpGuess($otp);
+        $this->state->setTimestamp($request['timestamp']);
+        $this->state->setUserOtpGuess($otp);
         // Redirect to the dashboard or the intended URL
         return redirect(route('dashboard'));
     }
@@ -99,21 +114,20 @@ class SsoMfaMiddleware
     private function isMfaVerified()
     {
         try {
-            $timestamp = SsomfaPackageState::getTimestamp();
+            $timestamp = $this->state->getTimestamp();
             $appId = config('app.id');
             $appName = config('app.name');
-            $email = SsomfaPackageState::getUserEmail();
-            $otp = SsomfaPackageState::getUserOtpGuess();
+            $email = $this->state->getUserEmail();
+            $otp = $this->state->getUserOtpGuess();
             $ssoApiUrl = $this->apiUrl . '/login';
             // Make a request to the verification endpoint
             $response = Http::post($ssoApiUrl, ['appId' => $appId, 'appName' => $appName, 'email' => $email, 'timestamp' => $timestamp, 'otp' => $otp]);
             $resDat = $response->json();
 
-            SsomfaPackageState::setOtpValid($resDat['okToLogin'] === true);
+            $this->state->setOtpValid($resDat['okToLogin'] === true);
 
             return $resDat['okToLogin'] === true;
         } catch (\Exception $e) {
-            // dump($e);
             return false;
         }
     }
@@ -131,7 +145,7 @@ class SsoMfaMiddleware
     public function logout()
     {
         $appId = config('app.id');
-        $email = SsomfaPackageState::getUserEmail();
+        $email = $this->state->getUserEmail();
         $ssoApiUrl = $this->apiUrl . '/logout';
         // Make a request to the verification endpoint
         Http::post($ssoApiUrl, ['appId' => $appId, 'email' => $email]);
