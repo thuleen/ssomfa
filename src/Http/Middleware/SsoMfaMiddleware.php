@@ -24,7 +24,8 @@ class SsoMfaMiddleware
         $packageRoot = dirname(__DIR__, 3);
         $dotenv = Dotenv::createImmutable($packageRoot);
         $dotenv->load();
-        $this->apiUrl = env('THULEEN_SSOMFA_API_URL');
+        $this->state = new SsomfaPackageState();
+        $this->apiUrl = config('ssomfa.api_url'); // Refer config/ssomfa.php file
         try {
             $appId = config('app.id');
             $appName = config('app.name');
@@ -32,7 +33,6 @@ class SsoMfaMiddleware
             $response = Http::get($ssoApiUrl);
             $responseData = $response->json();
             $this->dappUrl = $responseData['dappUrl'];
-            $this->state = new SsomfaPackageState();
             $this->state->setContractIsLoaded(strlen($responseData['contractName']) > 0);
             $this->state->setMfaContractAddress($responseData['contractAddress']);
             $this->state->setDevMode($responseData['devMode']);
