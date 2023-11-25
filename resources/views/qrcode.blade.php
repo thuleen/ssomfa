@@ -44,7 +44,9 @@
         .alert,
         alert-warning {
             font-weight: bold;
-            font-size: 1.0rem;
+            font-size: 1.2rem;
+            color: #273c75;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         h1,
@@ -78,6 +80,11 @@
         function copyToClipboard(id) {
             document.getElementById(id).select();
             document.execCommand('copy');
+        }
+
+        function refreshPage() {
+            // Reload the current page
+            location.reload();
         }
     </script>
 
@@ -136,17 +143,14 @@
 <body>
     <div class="d-flex flex-column justify-content-center align-items-center mt-3">
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
-            <h2>1. QR</h2>
             <img src={{ $dataUri }} alt='qr code' />
-            <div style="height: 25px">
+            <div style="height: 85px">
                 @if(!$isOtpValid && $count > 0)
-                <div class="alert alert-danger" style="width: 295px" role="alert">
-                    Imbas sekali lagi dan masukkan OTP!
+                <div class="alert alert-warning text-center" style="width: 575px" role="alert">
+                    Klik REFRESH dan imbas kod sekali lagi!
+                    <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
                 </div>
                 @endif
-            </div>
-            <div class="mt-5 mb-3">
-                <h2>2. OTP</h2>
             </div>
             <div class="d-flex flex-column mb-3 align-items-center">
                 <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">

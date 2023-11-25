@@ -86,6 +86,8 @@
             <br />
             Once resolve, refresh this page.
             <br />
+            <code>{{ $apiUrl }}</code>
+            <br />
             <button class="btn btn-primary mt-3 btn-thuleen" type="submit" onclick="reloadWindow()">REFRESH</button>
         </div>
     </div>
