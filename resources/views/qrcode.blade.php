@@ -27,14 +27,14 @@
             background-color: #f8f9fa;
             font-family: 'Open Sans', sans-serif;
             font-weight: 500;
-            font-size: small;
+            font-size: large;
             color: #273c75;
         }
 
         .code-blue {
             color: #273c75;
             /* or any other shade of blue you prefer */
-            font-size: small;
+            font-size: large;
         }
 
         .warning-text {
@@ -137,10 +137,8 @@
     <div class="d-flex flex-column justify-content-center align-items-center mt-3">
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
             <h2>1. QR</h2>
-            <div>
-                <img src={{ $dataUri }} alt='qr code' />
-            </div>
-            <div style="height: 27px">
+            <img src={{ $dataUri }} alt='qr code' />
+            <div style="height: 25px">
                 @if(!$isOtpValid && $count > 0)
                 <div class="alert alert-danger" style="width: 295px" role="alert">
                     Imbas sekali lagi dan masukkan OTP!
@@ -169,9 +167,12 @@
         </div>
         <!-- developer console -->
         @if($devMode)
-        <div class="d-flex flex-row mt-2 align-items-center">
-            <input class="form-control mb-1" style="width: 375px;" type="text" value="{{ $url }}" id="urlField" readonly>
-            <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-row mt-2 align-items-center">
+                <input class="form-control mb-1" style="width: 375px;" type="text" value="{{ $url }}" id="urlField" readonly>
+                <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
+            </div>
+            <code class="code-blue"> {{ $apiUrl }} </code>
         </div>
         @endif
     </div>

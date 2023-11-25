@@ -44,6 +44,7 @@ class SsoMfaMiddleware
 
     public function handle($request, Closure $next)
     {
+        $apiUrl = $this->apiUrl;
         $appId = config('app.id');
         $appName = config('app.name');
         $email = $request->user()->email;
@@ -56,7 +57,7 @@ class SsoMfaMiddleware
         if (!$isContractLoaded) {
             $dappUrl = $this->dappUrl;
             // Redirect to the warning page
-            return response(view('ssomfa::warning', compact('isContractLoaded', 'dappUrl')));
+            return response(view('ssomfa::warning', compact('isContractLoaded', 'dappUrl', 'apiUrl')));
         }
 
         $count = Cache::get('thuleen.ssomfa.user.otp.count', 0);
@@ -75,7 +76,7 @@ class SsoMfaMiddleware
 
             $mfaContractAddr = $this->state->getMfaContractAddress();
             $isOtpValid = null;
-            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count')));
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl')));
         } elseif (!$this->isMfaVerified($timestamp) && $this->state->getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
@@ -90,7 +91,7 @@ class SsoMfaMiddleware
 
             $mfaContractAddr = $this->state->getMfaContractAddress();
             $isOtpValid = $this->state->isOtpValid();
-            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count')));
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl')));
         }
 
         $otp = $this->state->getUserOtpGuess();
