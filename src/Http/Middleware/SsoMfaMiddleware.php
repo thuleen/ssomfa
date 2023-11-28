@@ -32,6 +32,7 @@ class SsoMfaMiddleware
             $ssoApiUrl = $this->apiUrl . '/init' . '/' . $appId . '/' . $appName;
             $response = Http::get($ssoApiUrl);
             $responseData = $response->json();
+            // dump($responseData);
             $this->dappUrl = $responseData['dappUrl'];
             $this->state->setContractIsLoaded(strlen($responseData['contractName']) > 0);
             $this->state->setMfaContractAddress($responseData['contractAddress']);
