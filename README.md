@@ -8,11 +8,21 @@ The following are the steps to integrate with the SSOMFA system.
 
 # IMPORTANT
 
-It is required that your laravel/php based application to host on a secure connection using SSL (HTTPS).
+It is **required** that your laravel/php application to host on a secure connection using SSL (HTTPS).
+
+## Download package
+
+Download the `ssomfa` package. For example using git:
+
+```
+git clone https://github.com/thuleen/ssomfa.git
+```
+
+Take note the path of the `ssomfa`.
 
 ## 1. Environment
 
-Include the following line in the `.env` file of your php application:
+Include the following line in the `.env` file of your laravel/php application:
 
 ```
 APP_ID=1
@@ -26,13 +36,12 @@ use Illuminate\Support\ServiceProvider;
 
 return [
     'id' => env('APP_ID', '1'),
-    'name' => env('APP_NAME', 'Laravel'),
     ...
 ```
 
 ## 2. Routes
 
-Add `'ssomfa_verify'` in the middleware array:
+In the `routes/web.php`, add `'ssomfa_verify'` like so:
 
 ```
 Route::get('/dashboard', function () {
@@ -42,7 +51,7 @@ Route::get('/dashboard', function () {
 
 ## 3. Kernel
 
-In the `app/Http/Kernel.php`;
+In the `app/Http/Kernel.php`, add the following line in the last item;
 
 ```
     protected $middlewareAliases = [
@@ -53,7 +62,7 @@ In the `app/Http/Kernel.php`;
 
 ## 4. AuthenticatedSessionController.php
 
-Add `app(SsoMfaMiddleware::class)->logout();` in the `destroy` function:
+In the `app/Http/Controllers/Auth/AuthenticatedSessionController.php`, add `app(SsoMfaMiddleware::class)->logout();` in the `destroy` function:
 
 ```
 public function destroy(Request $request): RedirectResponse
@@ -71,8 +80,6 @@ public function destroy(Request $request): RedirectResponse
 ```
 
 ## 5. Install package
-
-Download the `ssomfa` package.
 
 Then, in the `composer.json` file edit as the followings:
 
