@@ -163,6 +163,7 @@
                             <input type="text" id="digit-5" name="otp-digit-5" data-next="otp-digit-6" data-previous="otp-digit-4" maxlength="1" />
                             <input hidden name="email" value='{{$email}}' />
                             <input hidden name="timestamp" value='{{$timestamp}}' />
+                            <input hidden name="securePage" value={{$securedRouteName}} />
                         </div>
                         <button type="submit" class="btn btn-primary thuleen-primary-btn">OK</button>
                     </div>
@@ -177,6 +178,7 @@
                 <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
             </div>
             <code class="code-blue"> {{ $apiUrl }} </code>
+            <code class="code-blue"> {{$securedRouteName}} </code>
         </div>
         @endif
     </div>

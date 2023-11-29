@@ -46,7 +46,7 @@ In the `routes/web.php`, add `'ssomfa_verify'` like so:
 ```
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified', ssomfa_verify'])->name('dashboard');
+})->middleware(['auth', 'verified', 'ssomfa_verify'])->name('dashboard');
 ```
 
 ## 3. Kernel
@@ -65,9 +65,12 @@ In the `app/Http/Kernel.php`, add the following line in the last item;
 In the `app/Http/Controllers/Auth/AuthenticatedSessionController.php`, add `app(SsoMfaMiddleware::class)->logout();` in the `destroy` function:
 
 ```
+
+use Thuleen\Ssomfa\Http\Middleware\SsoMfaMiddleware; // <<-- Add this line
+
 public function destroy(Request $request): RedirectResponse
 {
-    app(SsoMfaMiddleware::class)->logout(); // <<-- Add this line
+    app(SsoMfaMiddleware::class)->logout();          // <<-- Add this line
 
     Auth::guard('web')->logout();
 

@@ -16,6 +16,7 @@ class SsomfaPackageState
   private const TIMESTAMP = 'thuleen.ssomfa.user.timestamp';
   private const USER_OTP_VALID = 'thuleen.ssomfa.user.otp.valid';
   private const DEV_MODE = 'thuleen.ssomfa.dev.mode';
+  private const SECURED_ROUTE_NAME = 'thuleen.ssomfa.secured.routeName';
 
   private $isContractLoaded = false;
   private $guessCounter = 0;
@@ -104,5 +105,15 @@ class SsomfaPackageState
   public function getDevMode()
   {
     return Cache::get(self::DEV_MODE);
+  }
+
+  public function setSecuredRouteName($routeName)
+  {
+    Cache::put(self::SECURED_ROUTE_NAME, $routeName);
+  }
+
+  public function getSecuredRouteName()
+  {
+    return Cache::get(self::SECURED_ROUTE_NAME);
   }
 }

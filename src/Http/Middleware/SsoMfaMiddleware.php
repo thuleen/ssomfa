@@ -4,6 +4,7 @@ namespace Thuleen\Ssomfa\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Color\Color;
@@ -74,10 +75,12 @@ class SsoMfaMiddleware
             $writer = new PngWriter();
             $result = $writer->write($qrCode, $logo);
             $dataUri = $result->getDataUri();
+            $securedRouteName = Route::currentRouteName();
+            $this->state->setSecuredRouteName($securedRouteName);
 
             $mfaContractAddr = $this->state->getMfaContractAddress();
             $isOtpValid = null;
-            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl')));
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl', 'securedRouteName')));
         } elseif (!$this->isMfaVerified($timestamp) && $this->state->getUserOtpGuess()) {
 
             $url = $this->generateUrl($email, $timestamp);
@@ -89,10 +92,12 @@ class SsoMfaMiddleware
             $writer = new PngWriter();
             $result = $writer->write($qrCode, $logo);
             $dataUri = $result->getDataUri();
+            $securedRouteName = Route::currentRouteName();
+            $this->state->setSecuredRouteName($securedRouteName);
 
             $mfaContractAddr = $this->state->getMfaContractAddress();
             $isOtpValid = $this->state->isOtpValid();
-            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl')));
+            return response(view('ssomfa::qrcode', compact('devMode', 'dataUri', 'url', 'appName', 'email', 'isContractLoaded', 'mfaContractAddr', 'isOtpValid', 'timestamp', 'count', 'apiUrl', 'securedRouteName')));
         }
 
         $otp = $this->state->getUserOtpGuess();
@@ -109,8 +114,10 @@ class SsoMfaMiddleware
         $otp = $request['otp-digit-1'] . $request['otp-digit-2'] . $request['otp-digit-3'] . $request['otp-digit-4'] . $request['otp-digit-5'];
         $this->state->setTimestamp($request['timestamp']);
         $this->state->setUserOtpGuess($otp);
+
+        $securedRouteName = $this->state->getSecuredRouteName();
         // Redirect to the dashboard or the intended URL
-        return redirect(route('dashboard'));
+        return redirect(route($securedRouteName));
     }
 
     private function isMfaVerified()
