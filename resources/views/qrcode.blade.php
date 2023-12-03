@@ -143,7 +143,7 @@
             <img src={{ $dataUri }} alt='qr code' />
             @if(!$isOtpValid && $count > 0)
             <div class="alert alert-danger text-center" style="padding: 5px" role="alert">
-                Klik REFRESH dan imbas kod sekali lagi!
+                Invalid OTP
                 <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
             </div>
             @endif
