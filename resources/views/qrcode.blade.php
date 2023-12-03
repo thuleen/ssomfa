@@ -59,9 +59,9 @@
         }
 
         .otp-digit-group input {
-            width: 3rem;
+            width: 1rem;
             /* Adjust the width as needed */
-            height: 3rem;
+            height: 1rem;
             /* Make the input fields square */
             text-align: center;
             margin: 0 0.2rem;
