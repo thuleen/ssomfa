@@ -39,13 +39,6 @@
             color: #c23616;
         }
 
-        .alert,
-        alert-warning {
-            font-weight: bold;
-            color: #273c75;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
         h1,
         h2,
         h5 {
