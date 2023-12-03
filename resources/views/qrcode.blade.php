@@ -172,7 +172,7 @@
         @if($devMode)
         <div class="d-flex flex-column">
             <div class="d-flex flex-row mt-2 align-items-center">
-                <input class="form-control mb-1" style="width: 435px;" type="text" value="{{ $url }}" id="urlField" readonly>
+                <input class="form-control mb-1" style="width: 575px;" type="text" value="{{ $url }}" id="urlField" readonly>
                 <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
             </div>
             <div class="d-flex flex-row mt-2 align-items-center">
