@@ -1,5 +1,6 @@
 {
     "name": "thuleen/ssomfa",
+    "version": "0.0.2",
     "description": "Implements single sign on and multi factor authentication",
     "keywords": [
         "thuleen",
