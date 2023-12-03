@@ -150,10 +150,10 @@
             <img src={{ $dataUri }} alt='qr code' />
             @if(!$isOtpValid && $count > 0)
             <div class="alert alert-danger text-center" style="padding: 5px; padding-left: 15px; padding-right: 15px" role="alert">
-                <p class="mb-0" style="margin-right: 15px">
+                <p class="mb-3">
                     Invalid OTP
                 </p>
-                <button onclick="refreshPage()" class="btn btn-primary thuleen-danger-btn">Try again</button>
+                <button onclick="refreshPage()" class="btn btn-primary thuleen-danger-btn">TRY AGAIN</button>
             </div>
             @endif
             <div class="d-flex flex-column mb-3 align-items-center">
