@@ -68,6 +68,7 @@ class SsoMfaMiddleware
 
             $url = $this->generateUrl($email, $timestamp);
             $qrCode = QrCode::create($url);
+            $qrCode->setSize(270);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $logo = Logo::create(__DIR__ . '/assets/images/logo.png')
                 // ->setResizeToWidth(55)
@@ -85,6 +86,7 @@ class SsoMfaMiddleware
 
             $url = $this->generateUrl($email, $timestamp);
             $qrCode = QrCode::create($url);
+            $qrCode->setSize(270);
             $qrCode->setForegroundColor(new Color(39, 60, 117));
             $logo = Logo::create(__DIR__ . '/assets/images/logo.png')
                 // ->setResizeToWidth(55)
