@@ -39,7 +39,7 @@ class SsoMfaMiddleware
             $this->state->setMfaContractAddress($responseData['contractAddress']);
             $this->state->setDevMode($responseData['devMode']);
         } catch (\Exception $e) {
-            // dump($e);
+            dump($e);
             $this->state->setContractIsLoaded(false);
         }
     }
