@@ -71,6 +71,12 @@
             background-color: #192a56;
             color: #fff;
         }
+
+        .thuleen-danger-btn {
+            border: none;
+            background-color: #c23616;
+            color: #fff;
+        }
     </style>
 
     <script>
@@ -142,9 +148,9 @@
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
             <img src={{ $dataUri }} alt='qr code' />
             @if(!$isOtpValid && $count > 0)
-            <div class="alert alert-danger text-center" style="padding: 5px" role="alert">
+            <div class="alert alert-danger text-center" style="padding: 5px; padding-left: 15px; padding-right: 15px" role="alert">
                 Invalid OTP
-                <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
+                <button onclick="refreshPage()" class="btn btn-primary thuleen-danger-btn">REFRESH</button>
             </div>
             @endif
             <div class="d-flex flex-column mb-3 align-items-center">
