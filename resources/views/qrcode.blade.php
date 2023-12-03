@@ -76,6 +76,7 @@
             border: none;
             background-color: #c23616;
             color: #fff;
+            font-family: 'Oswald', sans-serif;
         }
     </style>
 
