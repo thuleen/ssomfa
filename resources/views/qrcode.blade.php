@@ -143,7 +143,7 @@
     <div class="d-flex flex-column justify-content-center align-items-center mt-3">
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
             <img src={{ $dataUri }} alt='qr code' />
-            <div style="height: 85px">
+            <div style="height: 55px">
                 @if(!$isOtpValid && $count > 0)
                 <div class="alert alert-warning text-center" style="width: 575px" role="alert">
                     Klik REFRESH dan imbas kod sekali lagi!
