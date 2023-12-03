@@ -142,7 +142,7 @@
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
             <img src={{ $dataUri }} alt='qr code' />
             @if(!$isOtpValid && $count > 0)
-            <div class="alert alert-warning text-center" style="width: 575px" role="alert">
+            <div class="alert alert-error text-center" style="padding: 5px" role="alert">
                 Klik REFRESH dan imbas kod sekali lagi!
                 <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
             </div>
