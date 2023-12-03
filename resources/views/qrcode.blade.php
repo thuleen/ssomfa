@@ -176,8 +176,10 @@
                 <input class="form-control mb-1" style="width: 375px;" type="text" value="{{ $url }}" id="urlField" readonly>
                 <button value="copy" onclick="copyToClipboard('urlField')" class="btn btn-sm">Copy</button>
             </div>
-            <code class="code-blue"> {{ $apiUrl }} </code>
-            <code class="code-blue"> {{$securedRouteName}} </code>
+            <div class="d-flex flex-row mt-2 align-items-center">
+                <code class="code-blue"> {{ $apiUrl }} </code>
+                <code class="code-blue"> {{$securedRouteName}} </code>
+            </div>
         </div>
         @endif
     </div>
