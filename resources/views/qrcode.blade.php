@@ -34,7 +34,6 @@
         .code-blue {
             color: #273c75;
             /* or any other shade of blue you prefer */
-            font-size: large;
         }
 
         .warning-text {
