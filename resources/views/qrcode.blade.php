@@ -42,7 +42,6 @@
         .alert,
         alert-warning {
             font-weight: bold;
-            font-size: 1.2rem;
             color: #273c75;
             font-family: Arial, Helvetica, sans-serif;
         }
@@ -142,14 +141,12 @@
     <div class="d-flex flex-column justify-content-center align-items-center mt-3">
         <div class="d-flex flex-column flex-grow-1 justify-content-center align-items-center">
             <img src={{ $dataUri }} alt='qr code' />
-            <div style="height: 55px">
-                @if(!$isOtpValid && $count > 0)
-                <div class="alert alert-warning text-center" style="width: 575px" role="alert">
-                    Klik REFRESH dan imbas kod sekali lagi!
-                    <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
-                </div>
-                @endif
+            @if(!$isOtpValid && $count > 0)
+            <div class="alert alert-warning text-center" style="width: 575px" role="alert">
+                Klik REFRESH dan imbas kod sekali lagi!
+                <button onclick="refreshPage()" class="btn btn-primary">REFRESH</button>
             </div>
+            @endif
             <div class="d-flex flex-column mb-3 align-items-center">
                 <form method="post" action="{{ route('ssomfa.submit.otp.form') }}" class="otp-digit-group" data-group-name="otp-digits" data-autosubmit="false" autocomplete="off" id="otpForm">
                     <div class="d-flex flex-column">
