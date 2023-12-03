@@ -178,7 +178,7 @@
             </div>
             <div class="d-flex flex-row mt-2 align-items-center">
                 <code class="code-blue"> {{ $apiUrl }} </code>
-                <code style="margin-left: 3">{{$securedRouteName}}</code>
+                <code style="margin-left: 7px">{{$securedRouteName}}</code>
             </div>
         </div>
         @endif
