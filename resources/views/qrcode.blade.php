@@ -27,7 +27,6 @@
             background-color: #f8f9fa;
             font-family: 'Open Sans', sans-serif;
             font-weight: 500;
-            font-size: large;
             color: #273c75;
         }
 
