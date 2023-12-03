@@ -69,7 +69,7 @@ class SsomfaPackageState
   {
     $count = Cache::get(self::USER_OTP_GUESS . '.count', 0);
     $count++;
-    Cache::put(self::USER_OTP_GUESS . '.count', $count, now()->addMinutes(self::EXPIRATION_MINS));
+    Cache::put(self::USER_OTP_GUESS . '.count', $count);
   }
 
   public function getUserOtpGuess()
@@ -79,7 +79,7 @@ class SsomfaPackageState
 
   public function setOtpValid($valid)
   {
-    Cache::put(self::USER_OTP_VALID, $valid, now()->addMinutes(self::EXPIRATION_MINS));
+    Cache::put(self::USER_OTP_VALID, $valid);
   }
 
   public function isOtpValid()
