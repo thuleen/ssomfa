@@ -86,14 +86,6 @@ Then, in the `composer.json` file edit as the followings:
 
 ```
     ...
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/path/to/package/ssomfa"
-        }
-    ],
-
-    ...
 
      "require": {
         ...
