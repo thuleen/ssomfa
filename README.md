@@ -10,12 +10,10 @@ The following are the steps to integrate with the SSOMFA system.
 
 It is **required** that your laravel/php application to host on a secure connection using SSL (HTTPS).
 
-## Download package
-
-Download the `ssomfa` package. For example using git:
+## Install package
 
 ```
-git clone https://github.com/thuleen/ssomfa.git
+composer require thuleen/ssomfa
 ```
 
 Take note the path of the `ssomfa`.

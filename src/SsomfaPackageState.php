@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 
 class SsomfaPackageState
 {
-  private const EXPIRATION_MINS = 3;
+  private const EXPIRATION_MINS = 30;
   private const IS_CONTRACT_LOADED = 'thuleen.ssomfa.isContractLoaded';
   private const MFA_CONTRACT_ADDRESS = 'thuleen.ssomfa.contract.mfa.address';
   private const USER_EMAIL = 'thuleen.ssomfa.user.email';
@@ -61,7 +61,7 @@ class SsomfaPackageState
 
   public function setUserOtpGuess($otpGuess)
   {
-    Cache::put(self::USER_OTP_GUESS, $otpGuess, now()->addMinutes(self::EXPIRATION_MINS)); // Adjust the expiration time as needed
+    Cache::put(self::USER_OTP_GUESS, $otpGuess); // Adjust the expiration time as needed
     $this->guessCounter++;
   }
 
